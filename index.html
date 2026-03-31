@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UAE Cyber Attack Map — Live Threat Intelligence</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">
+        <span class="logo-icon">⬡</span>
+        <div>
+          <div class="logo-title">UAE CYBER THREAT MAP</div>
+          <div class="logo-sub">Real-Time Attack Intelligence Dashboard</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-center">
+      <div class="status-indicator">
+        <span class="pulse-dot"></span>
+        <span class="status-text">LIVE MONITORING</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="date" id="date">-- --- ----</div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="main-layout">
+
+    <!-- Left Panel -->
+    <aside class="panel panel-left">
+
+      <!-- Attack Counter -->
+      <div class="card">
+        <div class="card-title">ATTACKS TODAY</div>
+        <div class="big-number" id="attackCount">0</div>
+        <div class="card-sub" id="attackRate">+0 / min</div>
+      </div>
+
+      <!-- Attack Types -->
+      <div class="card">
+        <div class="card-title">ATTACK TYPES</div>
+        <div class="attack-types" id="attackTypes">
+          <div class="type-row">
+            <span class="type-dot" style="background:#ff3c3c"></span>
+            <span class="type-name">DDoS</span>
+            <div class="type-bar-wrap"><div class="type-bar" style="background:#ff3c3c;width:0%" id="bar-DDoS"></div></div>
+            <span class="type-count" id="cnt-DDoS">0</span>
+          </div>
+          <div class="type-row">
+            <span class="type-dot" style="background:#ff9900"></span>
+            <span class="type-name">Phishing</span>
+            <div class="type-bar-wrap"><div class="type-bar" style="background:#ff9900;width:0%" id="bar-Phishing"></div></div>
+            <span class="type-count" id="cnt-Phishing">0</span>
+          </div>
+          <div class="type-row">
+            <span class="type-dot" style="background:#ff00ff"></span>
+            <span class="type-name">Malware</span>
+            <div class="type-bar-wrap"><div class="type-bar" style="background:#ff00ff;width:0%" id="bar-Malware"></div></div>
+            <span class="type-count" id="cnt-Malware">0</span>
+          </div>
+          <div class="type-row">
+            <span class="type-dot" style="background:#00cfff"></span>
+            <span class="type-name">Ransomware</span>
+            <div class="type-bar-wrap"><div class="type-bar" style="background:#00cfff;width:0%" id="bar-Ransomware"></div></div>
+            <span class="type-count" id="cnt-Ransomware">0</span>
+          </div>
+          <div class="type-row">
+            <span class="type-dot" style="background:#39ff14"></span>
+            <span class="type-name">APT</span>
+            <div class="type-bar-wrap"><div class="type-bar" style="background:#39ff14;width:0%" id="bar-APT"></div></div>
+            <span class="type-count" id="cnt-APT">0</span>
+          </div>
+          <div class="type-row">
+            <span class="type-dot" style="background:#ffff00"></span>
+            <span class="type-name">SQL Injection</span>
+            <div class="type-bar-wrap"><div class="type-bar" style="background:#ffff00;width:0%" id="bar-SQLi"></div></div>
+            <span class="type-count" id="cnt-SQLi">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Threat Level -->
+      <div class="card">
+        <div class="card-title">THREAT LEVEL</div>
+        <div class="threat-meter">
+          <div class="threat-bar-container">
+            <div class="threat-bar-fill" id="threatFill"></div>
+          </div>
+          <div class="threat-label" id="threatLabel">MODERATE</div>
+        </div>
+        <div class="threat-segments">
+          <span>LOW</span><span>MOD</span><span>HIGH</span><span>CRIT</span>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Map -->
+    <div class="map-container">
+      <div id="map"></div>
+      <div class="map-overlay-text">UNITED ARAB EMIRATES — TARGET ZONE</div>
+    </div>
+
+    <!-- Right Panel -->
+    <aside class="panel panel-right">
+
+      <!-- Top Sources -->
+      <div class="card">
+        <div class="card-title">TOP ATTACK SOURCES</div>
+        <div id="topSources" class="source-list"></div>
+      </div>
+
+      <!-- Live Feed -->
+      <div class="card feed-card">
+        <div class="card-title">LIVE ATTACK FEED <span class="live-badge">LIVE</span></div>
+        <div class="feed" id="feed"></div>
+      </div>
+
+      <!-- Severity -->
+      <div class="card">
+        <div class="card-title">SEVERITY BREAKDOWN</div>
+        <div class="severity-grid" id="severityGrid">
+          <div class="sev-item critical"><div class="sev-num" id="sev-critical">0</div><div class="sev-lbl">CRITICAL</div></div>
+          <div class="sev-item high"><div class="sev-num" id="sev-high">0</div><div class="sev-lbl">HIGH</div></div>
+          <div class="sev-item medium"><div class="sev-num" id="sev-medium">0</div><div class="sev-lbl">MEDIUM</div></div>
+          <div class="sev-item low"><div class="sev-num" id="sev-low">0</div><div class="sev-lbl">LOW</div></div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span>UAE NATIONAL CYBERSECURITY CENTER — THREAT INTELLIGENCE</span>
+    <span id="footerStats">Monitoring 0 attack vectors across 0 countries</span>
+    <span>CLASSIFICATION: UNCLASSIFIED // SIMULATION</span>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script src="script.js"></script>
+</body>
+</html>
